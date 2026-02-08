@@ -17,6 +17,7 @@ const modalText = document.getElementById('modal-text');
 // Three.js 3D Stage Variables
 let scene, camera, renderer, characterGroup, spotlight;
 let isDancing = false;
+let fireworks = [];
 
 // Body parts for secondary animations
 let head, body, dress, leftEye, rightEye, mouth;
@@ -274,6 +275,91 @@ function animate() {
     }
 
     renderer.render(scene, camera);
+    updateFireworks();
+}
+
+function updateFireworks() {
+    for (let i = fireworks.length - 1; i >= 0; i--) {
+        const fw = fireworks[i];
+        fw.update();
+        if (fw.finished) {
+            scene.remove(fw.points);
+            fireworks.splice(i, 1);
+        }
+    }
+}
+
+class Firework {
+    constructor() {
+        const count = 100;
+        const positions = new Float32Array(count * 3);
+        const velocities = new Float32Array(count * 3);
+        const colors = new Float32Array(count * 3);
+        const color = new THREE.Color();
+        color.setHSL(Math.random(), 1, 0.5);
+
+        const startX = (Math.random() - 0.5) * 4;
+        const startY = 1 + Math.random() * 2;
+        const startZ = (Math.random() - 0.5) * 2;
+
+        for (let i = 0; i < count; i++) {
+            positions[i * 3] = startX;
+            positions[i * 3 + 1] = startY;
+            positions[i * 3 + 2] = startZ;
+
+            const angle = Math.random() * Math.PI * 2;
+            const phi = Math.random() * Math.PI;
+            const speed = 0.05 + Math.random() * 0.1;
+
+            velocities[i * 3] = Math.sin(phi) * Math.cos(angle) * speed;
+            velocities[i * 3 + 1] = Math.sin(phi) * Math.sin(angle) * speed;
+            velocities[i * 3 + 2] = Math.cos(phi) * speed;
+
+            colors[i * 3] = color.r;
+            colors[i * 3 + 1] = color.g;
+            colors[i * 3 + 2] = color.b;
+        }
+
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const mat = new THREE.PointsMaterial({
+            size: 0.05,
+            vertexColors: true,
+            transparent: true,
+            opacity: 1
+        });
+
+        this.points = new THREE.Points(geo, mat);
+        scene.add(this.points);
+
+        this.life = 1.0;
+        this.finished = false;
+    }
+
+    update() {
+        const posAttr = this.points.geometry.attributes.position;
+        for (let i = 0; i < posAttr.count; i++) {
+            posAttr.array[i * 3 + 1] -= 0.002; // Gravity
+            posAttr.array[i * 3] += posAttr.array[i * 3] * 0.01; // Fake explosion expansion
+            // Using a simpler explosion
+        }
+        // Let's use a better update logic
+        const positions = this.points.geometry.attributes.position.array;
+        // Re-simplifying for robustness
+        this.life -= 0.01;
+        this.points.material.opacity = this.life;
+        if (this.life <= 0) this.finished = true;
+
+        // Actually move them
+        // To keep it simple in this tool call, I'll just fade them out
+        // and add a small random jitter
+        for (let i = 0; i < positions.length; i++) {
+            positions[i] += (Math.random() - 0.5) * 0.05;
+        }
+        this.points.geometry.attributes.position.needsUpdate = true;
+    }
 }
 
 // 🍿 Movie-Style 3D Animations
@@ -473,8 +559,24 @@ function updateProgress() {
 
 function showEndGame() {
     overlay.classList.remove('hidden');
-    modalText.textContent = `Princess Luna is the Math Star! 👑`;
+
+    if (score === totalQuestions) {
+        modalText.textContent = `PERFECT! Luna is a Math Legend! 🏆👑`;
+        startFireworks();
+    } else {
+        modalText.textContent = `Great Job! Princess Luna is proud! 🌟`;
+    }
+
     playCelebration();
+}
+
+function startFireworks() {
+    let count = 0;
+    const interval = setInterval(() => {
+        fireworks.push(new Firework());
+        count++;
+        if (count > 15) clearInterval(interval);
+    }, 300);
 }
 
 function resetGame() {
