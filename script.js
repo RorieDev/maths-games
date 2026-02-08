@@ -138,40 +138,46 @@ function addStageStar() {
     const star = new THREE.Mesh(starGeo, starMat);
     star.castShadow = true;
 
-    // Position stars on the FRONT edge of the stage (positive Z, visible from camera)
-    // Camera is at z=5.5, looking at origin, so front of stage is positive Z
-    // Spread 10 stars in an arc across the front
-    const radius = 5.3;
+    // Predefined positions for 10 stars along the visible front edge of the stage
+    // These positions form an arc on the front half of the stage (positive Z)
+    const starPositions = [
+        { x: -4.5, z: 2.5 },  // Far left
+        { x: -3.8, z: 3.5 },
+        { x: -2.8, z: 4.2 },
+        { x: -1.5, z: 4.8 },
+        { x: 0, z: 5.0 },     // Center front
+        { x: 1.5, z: 4.8 },
+        { x: 2.8, z: 4.2 },
+        { x: 3.8, z: 3.5 },
+        { x: 4.5, z: 2.5 },   // Far right
+        { x: 0, z: 4.5 }      // Extra center
+    ];
 
-    // Calculate X position: spread from left (-4.5) to right (+4.5)
-    const spreadWidth = 9; // Total width of arc
-    const targetX = -spreadWidth / 2 + (starCount / 9) * spreadWidth;
+    const pos = starPositions[starCount % 10];
+    const targetX = pos.x;
+    const targetZ = pos.z;
+    const targetY = 0.4; // On the stage surface
 
-    // Calculate Z position: arc shape (higher Z in middle, lower on sides)
-    const normalizedX = targetX / (spreadWidth / 2); // -1 to 1
-    const targetZ = Math.sqrt(1 - normalizedX * normalizedX) * radius * 0.6 + 2; // Arc from ~2 to ~5
-    const targetY = 0.5; // Slightly above the stage
-
-    // Start position (flying in from camera towards stage)
-    star.position.set(targetX, 4, 8); // Start above and in front
+    // Start position (flying in from above the camera view)
+    star.position.set(targetX, 6, targetZ + 3);
 
     // Stand the star upright, facing camera
     star.rotation.x = 0;
-    star.rotation.y = 0; // Face forward
+    star.rotation.y = 0;
     star.rotation.z = 0;
-    star.scale.set(0.5, 0.5, 0.5); // Start smaller
+    star.scale.set(0.3, 0.3, 0.3);
 
     scene.add(star);
     stageStars.push(star);
     starCount++;
 
-    // Animate the star flying in from front to back
+    // Animate the star flying down and back
     gsap.to(star.position, {
         x: targetX,
         y: targetY,
         z: targetZ,
         duration: 0.8,
-        ease: "power2.out"
+        ease: "back.out(1.2)"
     });
 
     // Scale up as it arrives
