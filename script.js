@@ -138,42 +138,53 @@ function addStageStar() {
     const star = new THREE.Mesh(starGeo, starMat);
     star.castShadow = true;
 
-    // Position in a ring around the stage (radius ~5.5 to be on the edge)
-    const angle = (starCount / 10) * Math.PI * 2 - Math.PI / 2; // Start from top
+    // Position stars in a visible front arc (spread across the front of the stage)
+    // Spread 10 stars across an arc from left to right (visible from camera)
+    const arcSpread = Math.PI * 0.8; // 80% of semicircle for good visibility
+    const startAngle = Math.PI / 2 - arcSpread / 2; // Start from left side
+    const angle = startAngle + (starCount / 9) * arcSpread; // Spread evenly
     const radius = 5.3;
     const targetX = Math.cos(angle) * radius;
     const targetZ = Math.sin(angle) * radius;
-    const targetY = 0.3; // Slightly above the stage
+    const targetY = 0.5; // Slightly above the stage
 
-    // Start position (flying in from above)
-    star.position.set(targetX, 8, targetZ);
-    star.rotation.x = -Math.PI / 2; // Lay flat
-    star.rotation.z = Math.random() * Math.PI * 2; // Random rotation
-    star.scale.set(0, 0, 0); // Start small
+    // Start position (flying in from front - towards camera)
+    const startZ = 10; // Start in front of camera
+    const startY = 3; // Start a bit higher
+    star.position.set(targetX, startY, startZ);
+
+    // Stand the star upright (no x rotation), facing the camera
+    star.rotation.x = 0;
+    star.rotation.y = -angle + Math.PI / 2; // Face towards center/camera
+    star.rotation.z = 0;
+    star.scale.set(0.3, 0.3, 0.3); // Start smaller
 
     scene.add(star);
     stageStars.push(star);
     starCount++;
 
-    // Animate the star flying in with GSAP
+    // Animate the star flying in from front to back
     gsap.to(star.position, {
+        x: targetX,
         y: targetY,
-        duration: 0.8,
-        ease: "bounce.out"
+        z: targetZ,
+        duration: 1.0,
+        ease: "power2.out"
     });
 
+    // Scale up as it arrives
     gsap.to(star.scale, {
         x: 1,
         y: 1,
         z: 1,
-        duration: 0.5,
+        duration: 0.8,
         ease: "back.out(1.7)"
     });
 
-    // Add a little spin as it lands
+    // Add a spin as it flies in
     gsap.to(star.rotation, {
-        z: star.rotation.z + Math.PI * 2,
-        duration: 0.8,
+        z: Math.PI * 2,
+        duration: 1.0,
         ease: "power2.out"
     });
 }
