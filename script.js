@@ -558,25 +558,33 @@ function updateProgress() {
 }
 
 function showEndGame() {
-    overlay.classList.remove('hidden');
-
     if (score === totalQuestions) {
         modalText.textContent = `PERFECT! Luna is a Math Legend! 🏆👑`;
-        startFireworks();
+        startFireworks(true); // Special finale
+        playCelebration();
+
+        // Let the celebration play for a few seconds before showing the modal
+        setTimeout(() => {
+            overlay.classList.remove('hidden');
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.3)'; // Lighter overlay to see celebration
+        }, 4500);
     } else {
         modalText.textContent = `Great Job! Princess Luna is proud! 🌟`;
+        overlay.classList.remove('hidden');
+        playCelebration();
     }
-
-    playCelebration();
 }
 
-function startFireworks() {
+function startFireworks(isFinale = false) {
     let count = 0;
+    const max = isFinale ? 30 : 15;
+    const intervalTime = isFinale ? 200 : 300;
+
     const interval = setInterval(() => {
         fireworks.push(new Firework());
         count++;
-        if (count > 15) clearInterval(interval);
-    }, 300);
+        if (count > max) clearInterval(interval);
+    }, intervalTime);
 }
 
 function resetGame() {
