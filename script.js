@@ -406,10 +406,12 @@ function generateChoices() {
             choiceBox.style.zIndex = "";
 
             const touch = e.changedTouches[0];
-            const elementAtPoint = document.elementFromPoint(touch.clientX, touch.clientY);
-            const dropZone = elementAtPoint ? elementAtPoint.closest('.drop-zone') : null;
+            const dropZone = document.getElementById('answer-slot');
+            const rect = dropZone.getBoundingClientRect();
 
-            if (dropZone) {
+            // Check if touch is inside the answer slot boundaries
+            if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+                touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
                 handleDrop(val);
             }
         });
