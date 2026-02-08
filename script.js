@@ -30,27 +30,32 @@ function init3D() {
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    camera.position.set(0, 2, 7);
+    camera.position.set(0, 2.2, 5.5);
+    camera.lookAt(0, 1.5, 0);
 
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(width, height);
+
+    // Ensure we have valid dimensions
+    const finalWidth = width || 800;
+    const finalHeight = height || 350;
+
+    renderer.setSize(finalWidth, finalHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
 
     // Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.5);
-    scene.add(hemiLight);
+    const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    mainLight.position.set(5, 10, 7);
+    mainLight.castShadow = true;
+    scene.add(mainLight);
 
-    spotlight = new THREE.SpotLight(0xffffff, 0.8);
-    spotlight.position.set(5, 10, 5);
-    spotlight.castShadow = true;
-    spotlight.shadow.mapSize.width = 1024;
-    spotlight.shadow.mapSize.height = 1024;
+    spotlight = new THREE.SpotLight(0xffffff, 0.5);
+    spotlight.position.set(0, 10, 0);
     scene.add(spotlight);
 
     createStage();
@@ -91,7 +96,7 @@ function createPrincess() {
     // 1. Dress (Conical and Elegant)
     const dressGeo = new THREE.ConeGeometry(1.2, 2, 32);
     const dressMat = new THREE.MeshStandardMaterial({
-        color: 0xff0a54,
+        color: 0x9b5de5,
         roughness: 0.5,
         metalness: 0.2
     });
@@ -136,51 +141,112 @@ function createPrincess() {
     mouth.position.set(0, -0.1, 0.45);
     head.add(mouth);
 
+    // 4.5 PINK GLASSES
+    const glassesGroup = new THREE.Group();
+    glassesGroup.position.set(0, 0.1, 0.4);
+    head.add(glassesGroup);
+
+    const rimGeo = new THREE.TorusGeometry(0.15, 0.02, 16, 32);
+    const frameMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+
+    // Left Rim
+    const leftRim = new THREE.Mesh(rimGeo, frameMat);
+    leftRim.position.x = -0.18;
+    glassesGroup.add(leftRim);
+
+    // Right Rim
+    const rightRim = leftRim.clone();
+    rightRim.position.x = 0.18;
+    glassesGroup.add(rightRim);
+
+    // Bridge
+    const bridgeGeo = new THREE.BoxGeometry(0.1, 0.02, 0.02);
+    const bridge = new THREE.Mesh(bridgeGeo, frameMat);
+    glassesGroup.add(bridge);
+
+    // Arms
+    const armGeo = new THREE.BoxGeometry(0.02, 0.02, 0.4);
+    const leftArm = new THREE.Mesh(armGeo, frameMat);
+    leftArm.position.set(-0.35, 0, -0.2);
+    glassesGroup.add(leftArm);
+
+    const rightArm = leftArm.clone();
+    rightArm.position.x = 0.35;
+    glassesGroup.add(rightArm);
+
     // 5. Hair (Stylized Princess Hair)
-    const hairMat = new THREE.MeshStandardMaterial({ color: 0xf9d71c }); // Blonde hair
+    const hairMat = new THREE.MeshStandardMaterial({ color: 0xf9d71c, roughness: 0.4 });
+
+    // Main Hair Base (on the head)
     const hairGeo = new THREE.SphereGeometry(0.55, 32, 32);
-    const hairTop = new THREE.Mesh(hairGeo, hairMat);
-    hairTop.position.z = -0.15;
-    hairTop.scale.set(1.0, 1.0, 0.7);
-    head.add(hairTop);
+    const hairBase = new THREE.Mesh(hairGeo, hairMat);
+    hairBase.position.set(0, 0.1, -0.1);
+    hairBase.scale.set(1.05, 1.1, 1);
+    head.add(hairBase);
 
-    // Long Hair Strands
-    const strandGeo = new THREE.CapsuleGeometry(0.2, 1.5, 4, 16);
-    const leftStrand = new THREE.Mesh(strandGeo, hairMat);
-    leftStrand.position.set(-0.5, -0.6, -0.1);
-    leftStrand.rotation.z = 0.1;
-    head.add(leftStrand);
+    // THE TINY PONYTAIL (On the very top)
+    const ponyGroup = new THREE.Group();
+    ponyGroup.position.set(0, 0.55, 0);
+    head.add(ponyGroup);
 
-    const rightStrand = leftStrand.clone();
-    rightStrand.position.set(0.5, -0.6, -0.1);
-    rightStrand.rotation.z = -0.1;
-    head.add(rightStrand);
+    // Hair Tie
+    const tieGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.05, 16);
+    const tieMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    const tie = new THREE.Mesh(tieGeo, tieMat);
+    ponyGroup.add(tie);
 
-    const backHairGeo = new THREE.CapsuleGeometry(0.4, 1.8, 4, 16);
-    const backHair = new THREE.Mesh(backHairGeo, hairMat);
-    backHair.position.set(0, -0.8, -0.3);
-    head.add(backHair);
+    // The Sprouts
+    for (let i = 0; i < 3; i++) {
+        const sproutGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.3, 8);
+        const sprout = new THREE.Mesh(sproutGeo, hairMat);
+        sprout.position.y = 0.15;
+        sprout.rotation.z = (i - 1) * 0.4;
+        sprout.rotation.x = Math.random() * 0.5;
+        ponyGroup.add(sprout);
+    }
 
-    // 6. Crown (Golden)
-    const crownGeo = new THREE.TorusGeometry(0.2, 0.04, 16, 32);
+    // Long Hair Strands (flowing down)
+    for (let i = 0; i < 8; i++) {
+        const strandGeo = new THREE.CylinderGeometry(0.1, 0.1, 1.8, 8);
+        const strand = new THREE.Mesh(strandGeo, hairMat);
+        const angle = (i / 7) * Math.PI - (Math.PI / 2);
+        strand.position.set(Math.cos(angle) * 0.45, -0.8, Math.sin(angle) * 0.2 - 0.1);
+        strand.rotation.z = Math.cos(angle) * 0.2;
+        head.add(strand);
+    }
+
+    // 6. Crown (Golden & Shiny)
+    const crownGeo = new THREE.TorusGeometry(0.2, 0.05, 16, 32);
     const crownMat = new THREE.MeshStandardMaterial({
         color: 0xffd700,
-        metalness: 1,
-        roughness: 0.1
+        metalness: 0.5,
+        roughness: 0.2
     });
     const crown = new THREE.Mesh(crownGeo, crownMat);
     crown.rotation.x = Math.PI / 2;
-    crown.position.y = 0.5;
+    crown.position.y = 0.55; // Sit at the base of the ponytail
     head.add(crown);
 
-    // Crown peaks
-    const peakGeo = new THREE.ConeGeometry(0.05, 0.15, 16);
+    // Crown peaks (More delicate)
+    const peakGeo = new THREE.ConeGeometry(0.04, 0.15, 16);
     for (let i = 0; i < 5; i++) {
         const peak = new THREE.Mesh(peakGeo, crownMat);
         const angle = (i / 5) * Math.PI * 2;
         peak.position.set(Math.cos(angle) * 0.2, 0.1, Math.sin(angle) * 0.2);
         crown.add(peak);
     }
+
+    // 7. Golden Shoes
+    const shoeGeo = new THREE.SphereGeometry(0.15, 16, 16);
+    const shoeMat = new THREE.MeshStandardMaterial({ color: 0xffd700 });
+    const leftShoe = new THREE.Mesh(shoeGeo, shoeMat);
+    leftShoe.scale.set(1, 0.5, 1.5);
+    leftShoe.position.set(-0.4, 0, 0.5);
+    characterGroup.add(leftShoe);
+
+    const rightShoe = leftShoe.clone();
+    rightShoe.position.set(0.4, 0, 0.5);
+    characterGroup.add(rightShoe);
 
     characterGroup.position.y = 0;
     scene.add(characterGroup);
@@ -373,4 +439,4 @@ function resetGame() {
     location.reload();
 }
 
-initGame();
+document.addEventListener('DOMContentLoaded', initGame);

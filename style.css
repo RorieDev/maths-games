@@ -22,14 +22,16 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
+    overflow-y: auto;
+    padding: 20px 0;
     color: var(--text-color);
 }
 
 #game-container {
-    width: 90vw;
+    width: 95vw;
     max-width: 800px;
-    height: 90vh;
+    min-height: 90vh;
+    height: auto;
     background: white;
     border-radius: 40px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
@@ -42,7 +44,7 @@ body {
 
 header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 0.5rem;
 }
 
 h1 {
@@ -85,7 +87,7 @@ main {
 
 #question-area {
     background: #f0f4f8;
-    padding: 2rem;
+    padding: 0.5rem;
     border-radius: 30px;
     width: 100%;
     display: flex;
@@ -125,7 +127,7 @@ main {
     gap: 1.5rem;
     flex-wrap: wrap;
     justify-content: center;
-    margin: 2rem 0;
+    margin: 1rem 0;
 }
 
 .choice-box {
@@ -157,12 +159,14 @@ main {
 
 #character-container {
     width: 100%;
-    height: 300px;
+    height: 320px;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
     margin-top: -20px;
+    flex-shrink: 0;
+    /* Prevent Luna from being crushed */
 }
 
 #three-stage {
@@ -170,6 +174,10 @@ main {
     height: 100%;
     border-radius: 20px;
     cursor: default;
+    position: relative;
+    z-index: 5;
+    /* Ensure Luna is on top of the shadow */
+    display: block;
 }
 
 #math-character {
@@ -179,18 +187,9 @@ main {
     transform-style: preserve-3d;
 }
 
-/* 3D Floor Shadow */
+/* Shadow removed to avoid canvas overlap */
 #character-container::after {
-    content: '';
-    position: absolute;
-    bottom: 20px;
-    width: 80px;
-    height: 15px;
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    filter: blur(5px);
-    transition: transform 0.8s, opacity 0.8s;
-    z-index: 1;
+    display: none;
 }
 
 /* Adjust Shadow During Dances */
