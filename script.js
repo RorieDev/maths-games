@@ -384,9 +384,10 @@ function onWindowResize() {
 function animate() {
     requestAnimationFrame(animate);
 
+    const time = Date.now() * 0.002;
+
     if (characterGroup && !isDancing) {
         // Princess Breathing & Swaying
-        const time = Date.now() * 0.002;
         characterGroup.position.y = Math.sin(time) * 0.05;
         head.rotation.z = Math.sin(time * 0.5) * 0.05;
 
@@ -394,6 +395,24 @@ function animate() {
         leftEye.rotation.y = Math.sin(time * 0.5) * 0.1;
         rightEye.rotation.y = Math.sin(time * 0.5) * 0.1;
     }
+
+    // ✨ Sparkle animation for dress stars
+    stageStars.forEach((star, index) => {
+        // Each star twinkles at a different rate
+        const twinkleSpeed = 3 + index * 0.7;
+        const twinkle = Math.sin(time * twinkleSpeed) * 0.5 + 0.5; // 0 to 1
+
+        // Pulse the emissive intensity
+        if (star.material) {
+            star.material.emissiveIntensity = 0.8 + twinkle * 1.5; // 0.8 to 2.3
+        }
+
+        // Subtle scale pulse
+        const baseScale = 0.7;
+        const scaleVariation = 0.08;
+        const pulseScale = baseScale + Math.sin(time * twinkleSpeed * 1.5) * scaleVariation;
+        star.scale.setScalar(pulseScale);
+    });
 
     renderer.render(scene, camera);
     updateFireworks();
