@@ -18,6 +18,8 @@ const modalText = document.getElementById('modal-text');
 let scene, camera, renderer, characterGroup, spotlight;
 let isDancing = false;
 let fireworks = [];
+let stageStars = []; // Gold stars around the stage
+let starCount = 0; // Number of stars earned this round
 
 // Body parts for secondary animations
 let head, body, dress, leftEye, rightEye, mouth;
@@ -89,6 +91,98 @@ function createStage() {
     const base = new THREE.Mesh(baseGeo, baseMat);
     base.position.y = -0.25;
     scene.add(base);
+}
+
+// Create a gold star shape
+function createStarShape() {
+    const shape = new THREE.Shape();
+    const outerRadius = 0.3;
+    const innerRadius = 0.12;
+    const spikes = 5;
+
+    for (let i = 0; i < spikes * 2; i++) {
+        const radius = i % 2 === 0 ? outerRadius : innerRadius;
+        const angle = (i / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        if (i === 0) {
+            shape.moveTo(x, y);
+        } else {
+            shape.lineTo(x, y);
+        }
+    }
+    shape.closePath();
+    return shape;
+}
+
+// Add a gold star around the stage with flying animation
+function addStageStar() {
+    const starShape = createStarShape();
+    const extrudeSettings = {
+        depth: 0.08,
+        bevelEnabled: true,
+        bevelThickness: 0.02,
+        bevelSize: 0.02,
+        bevelSegments: 3
+    };
+
+    const starGeo = new THREE.ExtrudeGeometry(starShape, extrudeSettings);
+    const starMat = new THREE.MeshStandardMaterial({
+        color: 0xffd700,
+        metalness: 0.8,
+        roughness: 0.2,
+        emissive: 0xffa500,
+        emissiveIntensity: 0.3
+    });
+
+    const star = new THREE.Mesh(starGeo, starMat);
+    star.castShadow = true;
+
+    // Position in a ring around the stage (radius ~5.5 to be on the edge)
+    const angle = (starCount / 10) * Math.PI * 2 - Math.PI / 2; // Start from top
+    const radius = 5.3;
+    const targetX = Math.cos(angle) * radius;
+    const targetZ = Math.sin(angle) * radius;
+    const targetY = 0.3; // Slightly above the stage
+
+    // Start position (flying in from above)
+    star.position.set(targetX, 8, targetZ);
+    star.rotation.x = -Math.PI / 2; // Lay flat
+    star.rotation.z = Math.random() * Math.PI * 2; // Random rotation
+    star.scale.set(0, 0, 0); // Start small
+
+    scene.add(star);
+    stageStars.push(star);
+    starCount++;
+
+    // Animate the star flying in with GSAP
+    gsap.to(star.position, {
+        y: targetY,
+        duration: 0.8,
+        ease: "bounce.out"
+    });
+
+    gsap.to(star.scale, {
+        x: 1,
+        y: 1,
+        z: 1,
+        duration: 0.5,
+        ease: "back.out(1.7)"
+    });
+
+    // Add a little spin as it lands
+    gsap.to(star.rotation, {
+        z: star.rotation.z + Math.PI * 2,
+        duration: 0.8,
+        ease: "power2.out"
+    });
+}
+
+// Clear all stage stars (for new round)
+function clearStageStars() {
+    stageStars.forEach(star => scene.remove(star));
+    stageStars = [];
+    starCount = 0;
 }
 
 function createPrincess() {
@@ -525,6 +619,7 @@ function handleDrop(selectedAnswer) {
     answerSlot.style.color = 'var(--text-color)';
     if (val === correctAnswer) {
         score++;
+        addStageStar(); // Add a gold star to the stage!
         answerSlot.style.backgroundColor = '#d4edda';
         answerSlot.style.borderColor = 'var(--success-color)';
         gsap.to(answerSlot, { scale: 1.2, duration: 0.2, yoyo: true, repeat: 1 });
@@ -559,7 +654,7 @@ function updateProgress() {
 
 function showEndGame() {
     if (score === totalQuestions) {
-        modalText.textContent = `PERFECT! Luna is a Math Legend! 🏆👑`;
+        modalText.textContent = `PERFECT! Luna is a Maths Genius! 🏆👑`;
         startFireworks(true); // Special finale
         playCelebration();
 
