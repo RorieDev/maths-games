@@ -374,11 +374,51 @@ function generateChoices() {
         choiceBox.className = 'choice-box';
         choiceBox.textContent = val;
         choiceBox.draggable = true;
+
+        // Desktop Drag
         choiceBox.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('text/plain', val);
             choiceBox.classList.add('dragging');
         });
         choiceBox.addEventListener('dragend', () => choiceBox.classList.remove('dragging'));
+
+        // iPad/Touch Drag
+        let touchStartX, touchStartY;
+        choiceBox.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            choiceBox.classList.add('dragging');
+        }, { passive: false });
+
+        choiceBox.addEventListener('touchmove', (e) => {
+            e.preventDefault(); // Stop page scrolling while dragging
+            const touch = e.touches[0];
+            const dx = touch.clientX - touchStartX;
+            const dy = touch.clientY - touchStartY;
+            choiceBox.style.transform = `translate(${dx}px, ${dy}px) scale(1.1)`;
+            choiceBox.style.zIndex = "1000";
+        }, { passive: false });
+
+        choiceBox.addEventListener('touchend', (e) => {
+            choiceBox.classList.remove('dragging');
+            choiceBox.style.transform = '';
+            choiceBox.style.zIndex = "";
+
+            const touch = e.changedTouches[0];
+            const elementAtPoint = document.elementFromPoint(touch.clientX, touch.clientY);
+            const dropZone = elementAtPoint ? elementAtPoint.closest('.drop-zone') : null;
+
+            if (dropZone) {
+                handleDrop(val);
+            }
+        });
+
+        // Simple Click Fallback (Tap number, then it fills)
+        choiceBox.addEventListener('click', () => {
+            handleDrop(val);
+        });
+
         choicesArea.appendChild(choiceBox);
     });
 }
