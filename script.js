@@ -115,91 +115,99 @@ function createStarShape() {
     return shape;
 }
 
-// Add a gold star around the stage with flying animation
+// Add a gold star to Luna's dress with flying animation
 function addStageStar() {
+    if (!dress) return; // Make sure dress exists
+
     const starShape = createStarShape();
     const extrudeSettings = {
-        depth: 0.08,
+        depth: 0.05,
         bevelEnabled: true,
-        bevelThickness: 0.02,
-        bevelSize: 0.02,
-        bevelSegments: 3
+        bevelThickness: 0.01,
+        bevelSize: 0.01,
+        bevelSegments: 2
     };
 
     const starGeo = new THREE.ExtrudeGeometry(starShape, extrudeSettings);
     const starMat = new THREE.MeshStandardMaterial({
         color: 0xffd700,
-        metalness: 0.8,
-        roughness: 0.2,
-        emissive: 0xffa500,
-        emissiveIntensity: 0.3
+        metalness: 0.9,
+        roughness: 0.1,
+        emissive: 0xffaa00,
+        emissiveIntensity: 0.5
     });
 
     const star = new THREE.Mesh(starGeo, starMat);
     star.castShadow = true;
 
-    // Predefined positions for 10 stars along the visible front edge of the stage
-    // These positions form an arc on the front half of the stage (positive Z)
-    const starPositions = [
-        { x: -4.5, z: 2.5 },  // Far left
-        { x: -3.8, z: 3.5 },
-        { x: -2.8, z: 4.2 },
-        { x: -1.5, z: 4.8 },
-        { x: 0, z: 5.0 },     // Center front
-        { x: 1.5, z: 4.8 },
-        { x: 2.8, z: 4.2 },
-        { x: 3.8, z: 3.5 },
-        { x: 4.5, z: 2.5 },   // Far right
-        { x: 0, z: 4.5 }      // Extra center
+    // Predefined positions on the dress (cone shape)
+    // The dress is a cone with radius 1.2 at bottom, height 2, centered at y=1
+    // Stars will be placed around the dress surface
+    const dressStarPositions = [
+        { angle: 0, height: 0.3, radius: 1.0 },        // Front center low
+        { angle: Math.PI * 0.3, height: 0.5, radius: 0.95 },   // Front right
+        { angle: -Math.PI * 0.3, height: 0.5, radius: 0.95 },  // Front left
+        { angle: Math.PI * 0.15, height: 0.8, radius: 0.85 },  // Upper right
+        { angle: -Math.PI * 0.15, height: 0.8, radius: 0.85 }, // Upper left
+        { angle: 0, height: 1.0, radius: 0.7 },        // Front center high
+        { angle: Math.PI * 0.4, height: 0.2, radius: 1.05 },   // Low right
+        { angle: -Math.PI * 0.4, height: 0.2, radius: 1.05 },  // Low left
+        { angle: Math.PI * 0.2, height: 0.6, radius: 0.9 },    // Mid right
+        { angle: -Math.PI * 0.2, height: 0.6, radius: 0.9 }    // Mid left
     ];
 
-    const pos = starPositions[starCount % 10];
-    const targetX = pos.x;
-    const targetZ = pos.z;
-    const targetY = 0.4; // On the stage surface
+    const pos = dressStarPositions[starCount % 10];
 
-    // Start position (flying in from above the camera view)
-    star.position.set(targetX, 6, targetZ + 3);
+    // Calculate position on cone surface
+    const targetX = Math.sin(pos.angle) * pos.radius;
+    const targetY = pos.height - 1; // Relative to dress center (dress is at y=1)
+    const targetZ = Math.cos(pos.angle) * pos.radius;
 
-    // Stand the star upright, facing camera
+    // Start position (flying in from front of camera)
+    star.position.set(targetX, targetY + 5, targetZ + 5);
+
+    // Face outward from the dress
     star.rotation.x = 0;
-    star.rotation.y = 0;
+    star.rotation.y = pos.angle;
     star.rotation.z = 0;
-    star.scale.set(0.3, 0.3, 0.3);
+    star.scale.set(0.1, 0.1, 0.1); // Start tiny
 
-    scene.add(star);
+    // Add to the dress so it moves with Luna!
+    dress.add(star);
     stageStars.push(star);
     starCount++;
 
-    // Animate the star flying down and back
+    // Animate the star flying onto the dress
     gsap.to(star.position, {
         x: targetX,
         y: targetY,
         z: targetZ,
-        duration: 0.8,
-        ease: "back.out(1.2)"
-    });
-
-    // Scale up as it arrives
-    gsap.to(star.scale, {
-        x: 1,
-        y: 1,
-        z: 1,
         duration: 0.6,
-        ease: "back.out(1.7)"
+        ease: "back.out(2)"
     });
 
-    // Add a spin as it flies in
+    // Scale up with a pop
+    gsap.to(star.scale, {
+        x: 0.4,
+        y: 0.4,
+        z: 0.4,
+        duration: 0.5,
+        ease: "elastic.out(1, 0.5)"
+    });
+
+    // Spin as it lands
     gsap.to(star.rotation, {
-        z: Math.PI * 2,
-        duration: 0.8,
+        z: Math.PI * 3,
+        duration: 0.6,
         ease: "power2.out"
     });
 }
 
-// Clear all stage stars (for new round)
+// Clear all dress stars (for new round)
 function clearStageStars() {
-    stageStars.forEach(star => scene.remove(star));
+    stageStars.forEach(star => {
+        if (star.parent) star.parent.remove(star);
+    });
     stageStars = [];
     starCount = 0;
 }
