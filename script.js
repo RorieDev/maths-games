@@ -131,10 +131,10 @@ function addStageStar() {
     const starGeo = new THREE.ExtrudeGeometry(starShape, extrudeSettings);
     const starMat = new THREE.MeshStandardMaterial({
         color: 0xffd700,
-        metalness: 0.9,
-        roughness: 0.1,
-        emissive: 0xffaa00,
-        emissiveIntensity: 0.5
+        metalness: 1.0,
+        roughness: 0.0,
+        emissive: 0xffdd00,
+        emissiveIntensity: 1.2
     });
 
     const star = new THREE.Mesh(starGeo, starMat);
@@ -186,11 +186,11 @@ function addStageStar() {
         ease: "back.out(2)"
     });
 
-    // Scale up with a pop
+    // Scale up with a pop - BIGGER!
     gsap.to(star.scale, {
-        x: 0.4,
-        y: 0.4,
-        z: 0.4,
+        x: 0.7,
+        y: 0.7,
+        z: 0.7,
         duration: 0.5,
         ease: "elastic.out(1, 0.5)"
     });
