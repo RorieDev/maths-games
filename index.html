@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luna's Maths Adventures!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+</head>
+
+<body>
+    <div id="game-container">
+        <header>
+            <h1>Luna's Maths Adventures!</h1>
+            <div id="score-board">
+                <span>Sum: <span id="current-sum">1</span>/10</span>
+                <div id="progress-bar-container">
+                    <div id="progress-bar"></div>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div id="question-area">
+                <div id="problem">
+                    <span id="num1">?</span>
+                    <span id="operator">+</span>
+                    <span id="num2">?</span>
+                    <span id="equals">=</span>
+                    <div id="answer-slot" class="drop-zone">
+                        ?
+                    </div>
+                </div>
+            </div>
+
+            <div id="choices-area">
+                <!-- Answer choices will be generated here -->
+            </div>
+
+            <div id="character-container">
+                <div id="three-stage"></div>
+            </div>
+        </main>
+
+        <div id="overlay" class="hidden">
+            <div id="modal">
+                <h2 id="modal-text">Great Job!</h2>
+                <button id="restart-btn" onclick="resetGame()">Play Again!</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
