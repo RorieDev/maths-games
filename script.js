@@ -138,26 +138,28 @@ function addStageStar() {
     const star = new THREE.Mesh(starGeo, starMat);
     star.castShadow = true;
 
-    // Position stars in a visible front arc (spread across the front of the stage)
-    // Spread 10 stars across an arc from left to right (visible from camera)
-    const arcSpread = Math.PI * 0.8; // 80% of semicircle for good visibility
-    const startAngle = Math.PI / 2 - arcSpread / 2; // Start from left side
-    const angle = startAngle + (starCount / 9) * arcSpread; // Spread evenly
+    // Position stars on the FRONT edge of the stage (positive Z, visible from camera)
+    // Camera is at z=5.5, looking at origin, so front of stage is positive Z
+    // Spread 10 stars in an arc across the front
     const radius = 5.3;
-    const targetX = Math.cos(angle) * radius;
-    const targetZ = Math.sin(angle) * radius;
+
+    // Calculate X position: spread from left (-4.5) to right (+4.5)
+    const spreadWidth = 9; // Total width of arc
+    const targetX = -spreadWidth / 2 + (starCount / 9) * spreadWidth;
+
+    // Calculate Z position: arc shape (higher Z in middle, lower on sides)
+    const normalizedX = targetX / (spreadWidth / 2); // -1 to 1
+    const targetZ = Math.sqrt(1 - normalizedX * normalizedX) * radius * 0.6 + 2; // Arc from ~2 to ~5
     const targetY = 0.5; // Slightly above the stage
 
-    // Start position (flying in from front - towards camera)
-    const startZ = 10; // Start in front of camera
-    const startY = 3; // Start a bit higher
-    star.position.set(targetX, startY, startZ);
+    // Start position (flying in from camera towards stage)
+    star.position.set(targetX, 4, 8); // Start above and in front
 
-    // Stand the star upright (no x rotation), facing the camera
+    // Stand the star upright, facing camera
     star.rotation.x = 0;
-    star.rotation.y = -angle + Math.PI / 2; // Face towards center/camera
+    star.rotation.y = 0; // Face forward
     star.rotation.z = 0;
-    star.scale.set(0.3, 0.3, 0.3); // Start smaller
+    star.scale.set(0.5, 0.5, 0.5); // Start smaller
 
     scene.add(star);
     stageStars.push(star);
@@ -168,7 +170,7 @@ function addStageStar() {
         x: targetX,
         y: targetY,
         z: targetZ,
-        duration: 1.0,
+        duration: 0.8,
         ease: "power2.out"
     });
 
@@ -177,14 +179,14 @@ function addStageStar() {
         x: 1,
         y: 1,
         z: 1,
-        duration: 0.8,
+        duration: 0.6,
         ease: "back.out(1.7)"
     });
 
     // Add a spin as it flies in
     gsap.to(star.rotation, {
         z: Math.PI * 2,
-        duration: 1.0,
+        duration: 0.8,
         ease: "power2.out"
     });
 }
