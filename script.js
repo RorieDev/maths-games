@@ -570,13 +570,15 @@ function generateQuestion() {
     const isAddition = Math.random() > 0.5;
     let n1, n2;
     if (isAddition) {
-        n1 = Math.floor(Math.random() * 10) + 1;
-        n2 = Math.floor(Math.random() * 10) + 1;
+        // Harder addition for 6-7 year olds (up to 20 + 20)
+        n1 = Math.floor(Math.random() * 20) + 5;
+        n2 = Math.floor(Math.random() * 20) + 5;
         correctAnswer = n1 + n2;
         operatorElement.textContent = '+';
     } else {
-        n1 = Math.floor(Math.random() * 10) + 5;
-        n2 = Math.floor(Math.random() * n1) + 1;
+        // Harder subtraction for 6-7 year olds (up to 40 - 20)
+        n1 = Math.floor(Math.random() * 20) + 20;
+        n2 = Math.floor(Math.random() * (n1 - 1)) + 1;
         correctAnswer = n1 - n2;
         operatorElement.textContent = '-';
     }
@@ -590,10 +592,30 @@ function generateQuestion() {
 function generateChoices() {
     choicesArea.innerHTML = '';
     const choices = [correctAnswer];
-    while (choices.length < 4) {
-        let wrong = Math.floor(Math.random() * (correctAnswer > 5 ? 20 : 10));
-        if (!choices.includes(wrong) && wrong >= 0) choices.push(wrong);
+
+    // Clustering logic: potential answers near the correct one
+    const offsets = [-1, 1, -2, 2, -10, 10, -5, 5, -3, 3];
+
+    while (choices.length < 5) {
+        // Try clustering first
+        const offset = offsets[Math.floor(Math.random() * offsets.length)];
+        let wrong = correctAnswer + offset;
+
+        // Ensure choice is positive and unique
+        if (wrong < 0) wrong = Math.abs(wrong + 5);
+        if (wrong === correctAnswer) wrong += 7;
+
+        if (!choices.includes(wrong)) {
+            choices.push(wrong);
+        } else {
+            // Fallback random cluster
+            let randomWrong = correctAnswer + (Math.floor(Math.random() * 11) - 5);
+            if (randomWrong >= 0 && !choices.includes(randomWrong)) {
+                choices.push(randomWrong);
+            }
+        }
     }
+
     choices.sort(() => Math.random() - 0.5);
     choices.forEach(val => {
         const choiceBox = document.createElement('div');
