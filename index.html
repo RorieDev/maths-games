@@ -1,70 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luna Princess Maths</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Outfit:wght@400;700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌙</text></svg>">
-    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <link rel="manifest" href="manifest.json">
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(() => console.log("Service Worker Registered"));
-        }
-    </script>
-</head>
-
-<body>
-    <div id="game-container">
-        <header>
-            <h1>Luna Princess Maths</h1>
-            <div id="score-board">
-                <span>Sum: <span id="current-sum">1</span>/10</span>
-                <div id="progress-bar-container">
-                    <div id="progress-bar"></div>
-                </div>
-            </div>
-        </header>
-
-        <main>
-            <div id="question-area">
-                <div id="problem">
-                    <span id="num1">?</span>
-                    <span id="operator">+</span>
-                    <span id="num2">?</span>
-                    <span id="equals">=</span>
-                    <div id="answer-slot" class="drop-zone">
-                        ?
-                    </div>
-                </div>
-            </div>
-
-            <div id="choices-area">
-                <!-- Answer choices will be generated here -->
-            </div>
-
-            <div id="character-container">
-                <div id="three-stage"></div>
-            </div>
-        </main>
-
-        <div id="overlay" class="hidden">
-            <div id="modal">
-                <h2 id="modal-text">Great Job!</h2>
-                <button id="restart-btn" onclick="resetGame()">Play Again!</button>
-            </div>
-        </div>
-    </div>
-    <script src="script.js"></script>
-</body>
-
-</html>
+<!-- Add a new div to hold the game mode switch -->
+<div id="game-mode-switch">
+  <label for="game-mode">Choose a game mode:</label>
+  <select id="game-mode" name="game-mode">
+    <option value="easy">Easy</option>
+    <option value="hard" selected>Hard</option>
+  </select>
+</div>
+<script src="script.js"></script>

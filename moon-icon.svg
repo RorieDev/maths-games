@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">
+  <defs>
+    <linearGradient id="moonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFE87C;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFD700;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="1000" height="1000" fill="#1a1a2e"/>
+  <!-- Moon with glow -->
+  <circle cx="500" cy="500" r="380" fill="url(#moonGrad)" filter="drop-shadow(0 0 40px rgba(255,200,0,0.6))"/>
+  <!-- Moon craters for character -->
+  <circle cx="350" cy="400" r="60" fill="#FFD700" opacity="0.3"/>
+  <circle cx="600" cy="350" r="40" fill="#FFD700" opacity="0.2"/>
+  <circle cx="550" cy="600" r="50" fill="#FFD700" opacity="0.25"/>
+</svg>

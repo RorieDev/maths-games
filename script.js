@@ -755,3 +755,8 @@ function resetGame() {
 }
 
 document.addEventListener('DOMContentLoaded', initGame);
+document.addEventListener('change', (e) => {
+    if (e.target.id === 'game-mode') {
+        gameMode = e.target.value;
+    }
+});
