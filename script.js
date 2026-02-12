@@ -2,6 +2,8 @@ let currentQuestion = 1;
 let score = 0;
 let correctAnswer = 0;
 const totalQuestions = 10;
+let gameMode = 'easy';
+
 
 // UI Elements
 const num1Element = document.getElementById('num1');
@@ -569,19 +571,37 @@ function initGame() {
 function generateQuestion() {
     const isAddition = Math.random() > 0.5;
     let n1, n2;
-    if (isAddition) {
-        // Harder addition for 6-7 year olds (up to 20 + 20)
-        n1 = Math.floor(Math.random() * 20) + 5;
-        n2 = Math.floor(Math.random() * 20) + 5;
-        correctAnswer = n1 + n2;
-        operatorElement.textContent = '+';
+
+    if (gameMode === 'easy') {
+        if (isAddition) {
+            // Simple addition for 5-6 year olds (sum <= 12)
+            n1 = Math.floor(Math.random() * 6) + 1; // 1-6
+            n2 = Math.floor(Math.random() * 5) + 1; // 1-5
+            correctAnswer = n1 + n2;
+            operatorElement.textContent = '+';
+        } else {
+            // Simple subtraction (within 10)
+            n1 = Math.floor(Math.random() * 6) + 4; // 4-10
+            n2 = Math.floor(Math.random() * (n1 - 1)) + 1;
+            correctAnswer = n1 - n2;
+            operatorElement.textContent = '-';
+        }
     } else {
-        // Harder subtraction for 6-7 year olds (up to 40 - 20)
-        n1 = Math.floor(Math.random() * 20) + 20;
-        n2 = Math.floor(Math.random() * (n1 - 1)) + 1;
-        correctAnswer = n1 - n2;
-        operatorElement.textContent = '-';
+        if (isAddition) {
+            // Harder addition for 6-7 year olds (up to 20 + 20)
+            n1 = Math.floor(Math.random() * 20) + 5;
+            n2 = Math.floor(Math.random() * 20) + 5;
+            correctAnswer = n1 + n2;
+            operatorElement.textContent = '+';
+        } else {
+            // Harder subtraction for 6-7 year olds (up to 40 - 20)
+            n1 = Math.floor(Math.random() * 20) + 20;
+            n2 = Math.floor(Math.random() * (n1 - 1)) + 1;
+            correctAnswer = n1 - n2;
+            operatorElement.textContent = '-';
+        }
     }
+
     num1Element.textContent = n1;
     num2Element.textContent = n2;
     answerSlot.textContent = '?';
@@ -751,12 +771,19 @@ function startFireworks(isFinale = false) {
 }
 
 function resetGame() {
-    location.reload();
+    score = 0;
+    currentQuestion = 1;
+    clearStageStars();
+    initGame();
 }
 
+function setMode(mode) {
+    gameMode = mode;
+    document.getElementById('mode-easy').classList.toggle('active', mode === 'easy');
+    document.getElementById('mode-hard').classList.toggle('active', mode === 'hard');
+    resetGame();
+}
+
+
 document.addEventListener('DOMContentLoaded', initGame);
-document.addEventListener('change', (e) => {
-    if (e.target.id === 'game-mode') {
-        gameMode = e.target.value;
-    }
-});
+
