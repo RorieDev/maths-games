@@ -360,14 +360,14 @@ button:active {
 
 /* Child-Friendly Mode Toggle */
 #mode-toggle-container {
-    position: absolute;
-    top: 25px;
-    right: 25px;
+    position: relative;
+    margin: 0 auto 1.5rem auto;
     display: flex;
+    width: fit-content;
     background: #f8f9fa;
     padding: 6px;
     border-radius: 50px;
-    box-shadow: inset 0 3px 10px rgba(0,0,0,0.05);
+    box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.05);
     z-index: 1000;
     border: 2px solid #eee;
 }
@@ -403,6 +403,7 @@ button:active {
         right: 15px;
         padding: 4px;
     }
+
     .mode-btn {
         padding: 6px 14px;
         font-size: 0.85rem;
