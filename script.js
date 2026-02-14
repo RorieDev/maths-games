@@ -6,6 +6,7 @@ let gameMode = 'easy';
 let gameSubject = 'maths'; // 'maths' or 'english'
 let currentWord = null;
 let filledSlots = 0;
+let lastEnglishWord = null;
 
 const englishWords = [
     { word: "APPLE", image: "assets/english/apple.png", hint: "A crunchy red fruit" },
@@ -661,7 +662,21 @@ function generateEnglishQuestion() {
         return !w.level || w.level === 'easy';
     });
 
-    const wordObj = pool[Math.floor(Math.random() * pool.length)];
+    let wordObj;
+    
+    // If there's only one word in the pool, just use it
+    if (pool.length === 1) {
+        wordObj = pool[0];
+    } else {
+        // Keep picking until we get a different word from last time
+        let attempts = 0;
+        do {
+            wordObj = pool[Math.floor(Math.random() * pool.length)];
+            attempts++;
+        } while (wordObj.word === lastEnglishWord && attempts < 10);
+    }
+    
+    lastEnglishWord = wordObj.word;
     currentWord = wordObj.word;
     spellingImage.src = wordObj.image;
     spellingImage.alt = wordObj.hint;
@@ -723,9 +738,9 @@ function generateEnglishChoices() {
     // Collect all letters in the word
     const letters = currentWord.split('');
 
-    // Add some random letters as distractors
+    // Add some random letters as distractors (max 7 total letters)
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const targetLength = Math.max(letters.length + 2, 8);
+    const targetLength = Math.min(7, letters.length + 2);
 
     while (letters.length < targetLength && letters.length < 26) {
         const randomLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
@@ -945,6 +960,7 @@ function startFireworks(isFinale = false) {
 function resetGame() {
     score = 0;
     currentQuestion = 1;
+    lastEnglishWord = null;
     clearStageStars();
     initGame();
 }
