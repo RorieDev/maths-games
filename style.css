@@ -114,8 +114,10 @@ main {
 
 #english-problem {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
     width: 100%;
     animation: fadeIn 0.5s ease-out;
 }
@@ -133,12 +135,12 @@ main {
 }
 
 #spelling-image-container {
-    margin-bottom: 1.5rem;
+    flex-shrink: 0;
 }
 
 #spelling-image {
-    width: 160px;
-    height: 160px;
+    width: 130px;
+    height: 130px;
     object-fit: contain;
     border-radius: 25px;
     background: white;
@@ -149,21 +151,21 @@ main {
 
 #spelling-slots {
     display: flex;
-    gap: 0.8rem;
+    gap: 0.4rem;
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .letter-slot {
-    width: 70px;
-    height: 70px;
-    border: 4px dashed #ccc;
-    border-radius: 18px;
+    width: 50px;
+    height: 50px;
+    border: 3px dashed #ccc;
+    border-radius: 12px;
     background: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     font-family: var(--font-heading);
     color: var(--text-color);
     transition: all 0.2s ease;
@@ -534,5 +536,33 @@ button:active {
         width: 24px;
         height: 24px;
         stroke-width: 2.5;
+    }
+}
+
+/* iPad and tablet adjustments for English spelling game */
+@media (min-width: 768px) and (max-width: 1024px) {
+    #english-problem {
+        gap: 1rem;
+    }
+
+    #spelling-image {
+        width: 110px;
+        height: 110px;
+    }
+
+    #spelling-slots {
+        gap: 0.3rem;
+    }
+
+    .letter-slot {
+        width: 45px;
+        height: 45px;
+        font-size: 1.5rem;
+    }
+
+    .choice-box {
+        width: 60px;
+        height: 60px;
+        font-size: 1.8rem;
     }
 }
