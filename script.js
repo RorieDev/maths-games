@@ -3,7 +3,19 @@ let score = 0;
 let correctAnswer = 0;
 const totalQuestions = 10;
 let gameMode = 'easy';
+let gameSubject = 'maths'; // 'maths' or 'english'
+let currentWord = null;
+let filledSlots = 0;
 
+const englishWords = [
+    { word: "APPLE", image: "assets/english/apple.png", hint: "A crunchy red fruit" },
+    { word: "CAT", image: "assets/english/cat.png", hint: "A furry pet that meows" },
+    { word: "SUN", image: "assets/english/sun.png", hint: "Bright light in the sky" },
+    { word: "DOG", image: "assets/english/dog.png", hint: "Barks and wags tail" },
+    { word: "BALL", image: "assets/english/ball.png", hint: "Something to kick" },
+    { word: "DRAGON", image: "assets/english/dragon.png", hint: "A magical flying lizard", level: "hard" },
+    { word: "PRINCESS", image: "assets/english/princess.png", hint: "Luna is one!", level: "hard" }
+];
 
 // UI Elements
 const num1Element = document.getElementById('num1');
@@ -15,6 +27,12 @@ const progressBar = document.getElementById('progress-bar');
 const currentSumLabel = document.getElementById('current-sum');
 const overlay = document.getElementById('overlay');
 const modalText = document.getElementById('modal-text');
+
+// Subject Specific Containers
+const mathProblemArea = document.getElementById('math-problem');
+const englishProblemArea = document.getElementById('english-problem');
+const spellingImage = document.getElementById('spelling-image');
+const spellingSlotsContainer = document.getElementById('spelling-slots');
 
 // Three.js 3D Stage Variables
 let scene, camera, renderer, characterGroup, spotlight;
@@ -568,7 +586,26 @@ function initGame() {
     if (!scene) init3D();
 }
 
+function setSubject(subject) {
+    gameSubject = subject;
+    document.getElementById('subject-maths').classList.toggle('active', subject === 'maths');
+    document.getElementById('subject-english').classList.toggle('active', subject === 'english');
+    resetGame();
+}
+
 function generateQuestion() {
+    if (gameSubject === 'maths') {
+        mathProblemArea.classList.remove('hidden');
+        englishProblemArea.classList.add('hidden');
+        generateMathQuestion();
+    } else {
+        mathProblemArea.classList.add('hidden');
+        englishProblemArea.classList.remove('hidden');
+        generateEnglishQuestion();
+    }
+}
+
+function generateMathQuestion() {
     const isAddition = Math.random() > 0.5;
     let n1, n2;
 
@@ -609,88 +646,163 @@ function generateQuestion() {
     generateChoices();
 }
 
+function generateEnglishQuestion() {
+    // Filter words by level
+    const pool = englishWords.filter(w => {
+        if (gameMode === 'hard') return true;
+        return !w.level || w.level === 'easy';
+    });
+
+    const wordObj = pool[Math.floor(Math.random() * pool.length)];
+    currentWord = wordObj.word;
+    spellingImage.src = wordObj.image;
+    spellingImage.alt = wordObj.hint;
+
+    // Create slots
+    spellingSlotsContainer.innerHTML = '';
+    filledSlots = 0;
+    for (let i = 0; i < currentWord.length; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'letter-slot';
+        slot.dataset.index = i;
+        slot.textContent = '?';
+
+        // Drag & Drop for slots
+        slot.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            slot.classList.add('drag-over');
+        });
+        slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+        slot.addEventListener('drop', (e) => {
+            e.preventDefault();
+            slot.classList.remove('drag-over');
+            handleLetterDrop(e.dataTransfer.getData('text/plain'), i);
+        });
+
+        spellingSlotsContainer.appendChild(slot);
+    }
+
+    generateChoices();
+}
+
 function generateChoices() {
     choicesArea.innerHTML = '';
-    const choices = [correctAnswer];
 
-    // Clustering logic: potential answers near the correct one
+    if (gameSubject === 'maths') {
+        generateMathChoices();
+    } else {
+        generateEnglishChoices();
+    }
+}
+
+function generateMathChoices() {
+    const choices = [correctAnswer];
     const offsets = [-1, 1, -2, 2, -10, 10, -5, 5, -3, 3];
 
     while (choices.length < 5) {
-        // Try clustering first
         const offset = offsets[Math.floor(Math.random() * offsets.length)];
         let wrong = correctAnswer + offset;
-
-        // Ensure choice is positive and unique
         if (wrong < 0) wrong = Math.abs(wrong + 5);
         if (wrong === correctAnswer) wrong += 7;
-
-        if (!choices.includes(wrong)) {
-            choices.push(wrong);
-        } else {
-            // Fallback random cluster
-            let randomWrong = correctAnswer + (Math.floor(Math.random() * 11) - 5);
-            if (randomWrong >= 0 && !choices.includes(randomWrong)) {
-                choices.push(randomWrong);
-            }
-        }
+        if (!choices.includes(wrong)) choices.push(wrong);
     }
 
     choices.sort(() => Math.random() - 0.5);
-    choices.forEach(val => {
-        const choiceBox = document.createElement('div');
-        choiceBox.className = 'choice-box';
-        choiceBox.textContent = val;
-        choiceBox.draggable = true;
+    choices.forEach(val => createChoiceBox(val));
+}
 
-        // Desktop Drag
-        choiceBox.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', val);
-            choiceBox.classList.add('dragging');
-        });
-        choiceBox.addEventListener('dragend', () => choiceBox.classList.remove('dragging'));
+function generateEnglishChoices() {
+    // Collect all letters in the word
+    const letters = currentWord.split('');
 
-        // iPad/Touch Drag
-        let touchStartX, touchStartY;
-        choiceBox.addEventListener('touchstart', (e) => {
-            const touch = e.touches[0];
-            touchStartX = touch.clientX;
-            touchStartY = touch.clientY;
-            choiceBox.classList.add('dragging');
-        }, { passive: false });
+    // Add some random letters as distractors
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    while (letters.length < Math.max(letters.length + 2, 8)) {
+        const randomLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
+        if (!letters.includes(randomLetter)) {
+            letters.push(randomLetter);
+        }
+    }
 
-        choiceBox.addEventListener('touchmove', (e) => {
-            e.preventDefault(); // Stop page scrolling while dragging
-            const touch = e.touches[0];
-            const dx = touch.clientX - touchStartX;
-            const dy = touch.clientY - touchStartY;
-            choiceBox.style.transform = `translate(${dx}px, ${dy}px) scale(1.1)`;
-            choiceBox.style.zIndex = "1000";
-        }, { passive: false });
+    letters.sort(() => Math.random() - 0.5);
+    letters.forEach(letter => createChoiceBox(letter));
+}
 
-        choiceBox.addEventListener('touchend', (e) => {
-            choiceBox.classList.remove('dragging');
-            choiceBox.style.transform = '';
-            choiceBox.style.zIndex = "";
+function createChoiceBox(val) {
+    const choiceBox = document.createElement('div');
+    choiceBox.className = 'choice-box';
+    choiceBox.textContent = val;
+    choiceBox.draggable = true;
 
-            const touch = e.changedTouches[0];
+    // Desktop Drag
+    choiceBox.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', val);
+        choiceBox.classList.add('dragging');
+    });
+    choiceBox.addEventListener('dragend', () => choiceBox.classList.remove('dragging'));
+
+    // iPad/Touch Drag
+    let touchStartX, touchStartY;
+    choiceBox.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        choiceBox.classList.add('dragging');
+    }, { passive: false });
+
+    choiceBox.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const dx = touch.clientX - touchStartX;
+        const dy = touch.clientY - touchStartY;
+        choiceBox.style.transform = `translate(${dx}px, ${dy}px) scale(1.1)`;
+        choiceBox.style.zIndex = "1000";
+    }, { passive: false });
+
+    choiceBox.addEventListener('touchend', (e) => {
+        choiceBox.classList.remove('dragging');
+        choiceBox.style.transform = '';
+        choiceBox.style.zIndex = "";
+
+        const touch = e.changedTouches[0];
+
+        if (gameSubject === 'maths') {
             const dropZone = document.getElementById('answer-slot');
             const rect = dropZone.getBoundingClientRect();
-
-            // Check if touch is inside the answer slot boundaries
             if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
                 touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
                 handleDrop(val);
             }
-        });
-
-        // Simple Click Fallback (Tap number, then it fills)
-        choiceBox.addEventListener('click', () => {
-            handleDrop(val);
-        });
-
-        choicesArea.appendChild(choiceBox);
+        } else {
+            // Find which slot was hit
+            const slots = document.querySelectorAll('.letter-slot');
+            slots.forEach((slot, index) => {
+                const rect = slot.getBoundingClientRect();
+                if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+                    touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                    handleLetterDrop(val, index);
+                }
+            });
+        }
     });
+
+    // Simple Click Fallback
+    choiceBox.addEventListener('click', () => {
+        if (gameSubject === 'maths') {
+            handleDrop(val);
+        } else {
+            // Find first empty slot
+            const slots = document.querySelectorAll('.letter-slot');
+            for (let i = 0; i < slots.length; i++) {
+                if (slots[i].textContent === '?' || !slots[i].classList.contains('filled')) {
+                    handleLetterDrop(val, i);
+                    break;
+                }
+            }
+        }
+    });
+
+    choicesArea.appendChild(choiceBox);
 }
 
 answerSlot.addEventListener('dragover', (e) => { e.preventDefault(); answerSlot.classList.add('drag-over'); });
@@ -702,6 +814,8 @@ answerSlot.addEventListener('drop', (e) => {
 });
 
 function handleDrop(selectedAnswer) {
+    if (gameSubject !== 'maths') return;
+
     const val = parseInt(selectedAnswer);
     answerSlot.textContent = val;
     answerSlot.style.color = 'var(--text-color)';
@@ -725,6 +839,53 @@ function handleDrop(selectedAnswer) {
     }
 }
 
+function handleLetterDrop(letter, index) {
+    const slots = document.querySelectorAll('.letter-slot');
+    const slot = slots[index];
+
+    if (slot.classList.contains('filled')) return;
+
+    slot.textContent = letter;
+    slot.classList.add('filled');
+    filledSlots++;
+
+    if (filledSlots === currentWord.length) {
+        checkEnglishAnswer();
+    }
+}
+
+function checkEnglishAnswer() {
+    const slots = document.querySelectorAll('.letter-slot');
+    let spelledWord = "";
+    slots.forEach(slot => spelledWord += slot.textContent);
+
+    if (spelledWord === currentWord) {
+        score++;
+        addStageStar();
+        slots.forEach(slot => {
+            slot.style.backgroundColor = '#d4edda';
+            slot.style.borderColor = 'var(--success-color)';
+        });
+        playDance();
+    } else {
+        slots.forEach(slot => {
+            slot.style.backgroundColor = '#f8d7da';
+            slot.style.borderColor = '#dc3545';
+        });
+        gsap.to(spellingSlotsContainer, { x: 10, duration: 0.1, yoyo: true, repeat: 3 });
+
+        setTimeout(() => {
+            slots.forEach(slot => {
+                slot.textContent = '?';
+                slot.classList.remove('filled');
+                slot.style.backgroundColor = 'white';
+                slot.style.borderColor = '#ccc';
+            });
+            filledSlots = 0;
+        }, 1500);
+    }
+}
+
 function nextQuestion() {
     if (currentQuestion < totalQuestions) {
         currentQuestion++;
@@ -741,8 +902,9 @@ function updateProgress() {
 }
 
 function showEndGame() {
+    const subjectName = gameSubject === 'maths' ? 'Maths' : 'English';
     if (score === totalQuestions) {
-        modalText.textContent = `PERFECT! Luna is a Maths Genius! 🏆👑`;
+        modalText.textContent = `PERFECT! Luna is an ${subjectName} Genius! 🏆👑`;
         startFireworks(true); // Special finale
         playCelebration();
 
@@ -752,7 +914,7 @@ function showEndGame() {
             overlay.style.backgroundColor = 'rgba(0,0,0,0.3)'; // Lighter overlay to see celebration
         }, 4500);
     } else {
-        modalText.textContent = `Great Job! Princess Luna is proud! 🌟`;
+        modalText.textContent = `Great Job! Princess Luna is proud of your ${subjectName}! 🌟`;
         overlay.classList.remove('hidden');
         playCelebration();
     }

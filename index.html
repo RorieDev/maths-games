@@ -26,12 +26,18 @@
         </button>
 
         <header>
-            <!-- Child Friendly Mode Switch -->
-            <div id="mode-toggle-container">
+            <!-- Subject switch: Maths or English -->
+            <div id="subject-toggle-container" class="toggle-row">
+                <button id="subject-maths" class="mode-btn active" onclick="setSubject('maths')">Maths</button>
+                <button id="subject-english" class="mode-btn" onclick="setSubject('english')">English</button>
+            </div>
+
+            <!-- Level Switch: Easy or Hard -->
+            <div id="mode-toggle-container" class="toggle-row">
                 <button id="mode-easy" class="mode-btn active" onclick="setMode('easy')">Easy</button>
                 <button id="mode-hard" class="mode-btn" onclick="setMode('hard')">Hard</button>
             </div>
-            <h1>Luna's Maths 🌙</h1>
+            <h1>Luna's Games 🌙</h1>
             <div id="score-board">
                 <div id="progress-bar-container">
                     <div id="progress-bar"></div>
@@ -44,12 +50,22 @@
                 <div id="three-stage"></div>
             </div>
             <div id="question-area">
-                <div id="problem">
+                <!-- Maths Question -->
+                <div id="math-problem">
                     <span id="num1">0</span>
                     <span id="operator">+</span>
                     <span id="num2">0</span>
                     <span>=</span>
-                    <div id="answer-slot">?</div>
+                    <div id="answer-slot" class="drop-target">?</div>
+                </div>
+                <!-- English Question -->
+                <div id="english-problem" class="hidden">
+                    <div id="spelling-image-container">
+                        <img id="spelling-image" src="" alt="What is this?">
+                    </div>
+                    <div id="spelling-slots">
+                        <!-- Slots like [C] [A] [T] -->
+                    </div>
                 </div>
             </div>
             <div id="choices-area">
