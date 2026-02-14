@@ -17,7 +17,13 @@
 <body>
     <div id="game-container">
         <!-- Refresh Button - Fixed position top right of viewport -->
-        <button id="refresh-btn" onclick="resetGame()" title="Start New Game" aria-label="Start New Game">🔄</button>
+        <button id="refresh-btn" onclick="location.reload()" title="Refresh Game" aria-label="Refresh Game">
+            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="3"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+        </button>
 
         <header>
             <!-- Child Friendly Mode Switch -->
