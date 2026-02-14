@@ -465,10 +465,18 @@ button:active {
     transform: rotate(360deg) scale(0.9);
 }
 
+#controls-row {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
 /* Child-Friendly Mode Toggle */
 .toggle-row {
     position: relative;
-    margin: 0 auto 0.8rem auto;
+    margin: 0;
     display: flex;
     width: fit-content;
     background: #f8f9fa;
@@ -477,10 +485,6 @@ button:active {
     box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.05);
     z-index: 1000;
     border: 2px solid #eee;
-}
-
-#mode-toggle-container {
-    margin-bottom: 1.5rem;
 }
 
 .mode-btn {

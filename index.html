@@ -26,16 +26,17 @@
         </button>
 
         <header>
-            <!-- Subject switch: Maths or English -->
-            <div id="subject-toggle-container" class="toggle-row">
-                <button id="subject-maths" class="mode-btn active" onclick="setSubject('maths')">Maths</button>
-                <button id="subject-english" class="mode-btn" onclick="setSubject('english')">English</button>
-            </div>
+            <!-- Unified Toggles Row -->
+            <div id="controls-row">
+                <div id="subject-toggle-container" class="toggle-row">
+                    <button id="subject-maths" class="mode-btn active" onclick="setSubject('maths')">Maths</button>
+                    <button id="subject-english" class="mode-btn" onclick="setSubject('english')">English</button>
+                </div>
 
-            <!-- Level Switch: Easy or Hard -->
-            <div id="mode-toggle-container" class="toggle-row">
-                <button id="mode-easy" class="mode-btn active" onclick="setMode('easy')">Easy</button>
-                <button id="mode-hard" class="mode-btn" onclick="setMode('hard')">Hard</button>
+                <div id="mode-toggle-container" class="toggle-row">
+                    <button id="mode-easy" class="mode-btn active" onclick="setMode('easy')">Easy</button>
+                    <button id="mode-hard" class="mode-btn" onclick="setMode('hard')">Hard</button>
+                </div>
             </div>
             <h1>Luna's Games 🌙</h1>
             <div id="score-board">
