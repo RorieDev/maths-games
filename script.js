@@ -725,7 +725,9 @@ function generateEnglishChoices() {
 
     // Add some random letters as distractors
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    while (letters.length < Math.max(letters.length + 2, 8)) {
+    const targetLength = Math.max(letters.length + 2, 8);
+
+    while (letters.length < targetLength && letters.length < 26) {
         const randomLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
         if (!letters.includes(randomLetter)) {
             letters.push(randomLetter);
