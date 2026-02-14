@@ -29,10 +29,14 @@ const overlay = document.getElementById('overlay');
 const modalText = document.getElementById('modal-text');
 
 // Subject Specific Containers
-const mathProblemArea = document.getElementById('math-problem');
-const englishProblemArea = document.getElementById('english-problem');
-const spellingImage = document.getElementById('spelling-image');
-const spellingSlotsContainer = document.getElementById('spelling-slots');
+let mathProblemArea, englishProblemArea, spellingImage, spellingSlotsContainer;
+
+function setupUIReferences() {
+    mathProblemArea = document.getElementById('math-problem');
+    englishProblemArea = document.getElementById('english-problem');
+    spellingImage = document.getElementById('spelling-image');
+    spellingSlotsContainer = document.getElementById('spelling-slots');
+}
 
 // Three.js 3D Stage Variables
 let scene, camera, renderer, characterGroup, spotlight;
@@ -578,6 +582,7 @@ function playCelebration() {
 
 // Logical Loops
 function initGame() {
+    if (!mathProblemArea) setupUIReferences();
     currentQuestion = 1;
     score = 0;
     updateProgress();
@@ -587,9 +592,12 @@ function initGame() {
 }
 
 function setSubject(subject) {
+    console.log("Setting subject to:", subject);
     gameSubject = subject;
-    document.getElementById('subject-maths').classList.toggle('active', subject === 'maths');
-    document.getElementById('subject-english').classList.toggle('active', subject === 'english');
+    const mathsBtn = document.getElementById('subject-maths');
+    const englishBtn = document.getElementById('subject-english');
+    if (mathsBtn) mathsBtn.classList.toggle('active', subject === 'maths');
+    if (englishBtn) englishBtn.classList.toggle('active', subject === 'english');
     resetGame();
 }
 
@@ -947,5 +955,21 @@ function setMode(mode) {
 }
 
 
-document.addEventListener('DOMContentLoaded', initGame);
+function setupToggles() {
+    const mathsBtn = document.getElementById('subject-maths');
+    const englishBtn = document.getElementById('subject-english');
+    const easyBtn = document.getElementById('mode-easy');
+    const hardBtn = document.getElementById('mode-hard');
+
+    if (mathsBtn) mathsBtn.addEventListener('click', () => setSubject('maths'));
+    if (englishBtn) englishBtn.addEventListener('click', () => setSubject('english'));
+    if (easyBtn) easyBtn.addEventListener('click', () => setMode('easy'));
+    if (hardBtn) hardBtn.addEventListener('click', () => setMode('hard'));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    setupUIReferences();
+    setupToggles();
+    initGame();
+});
 

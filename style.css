@@ -513,10 +513,8 @@ button:active {
 
 /* Mobile adjustment for toggle */
 @media (max-width: 600px) {
-    #mode-toggle-container {
-        top: 15px;
-        right: 15px;
-        padding: 4px;
+    #controls-row {
+        gap: 0.5rem;
     }
 
     .mode-btn {
