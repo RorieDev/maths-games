@@ -1,61 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="version" content="1.0.1">
-  <title>Luna Princess Maths 🌙✨</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="version" content="1.0.1">
+    <title>Luna Princess Maths 🌙✨</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <div id="game-container">
-    <header style="position: relative; overflow: visible;">
-      <!-- Child Friendly Mode Switch -->
-      <div id="mode-toggle-container">
-        <button id="mode-easy" class="mode-btn active" onclick="setMode('easy')">Easy</button>
-        <button id="mode-hard" class="mode-btn" onclick="setMode('hard')">Hard</button>
-      </div>
-      <h1>Luna's Maths 🌙</h1>
-      <div id="score-board">
-        <div id="progress-bar-container">
-          <div id="progress-bar"></div>
+    <div id="game-container">
+        <!-- Refresh Button - Fixed position top right of viewport -->
+        <button id="refresh-btn" onclick="resetGame()" title="Start New Game" aria-label="Start New Game" style="position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #9b5de5 0%, #764ba2 100%); border: 4px solid #fff; border-radius: 50%; width: 60px; height: 60px; font-size: 30px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.4); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 0; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">🔄</button>
+        
+        <header>
+            <!-- Child Friendly Mode Switch -->
+            <div id="mode-toggle-container">
+                <button id="mode-easy" class="mode-btn active" onclick="setMode('easy')">Easy</button>
+                <button id="mode-hard" class="mode-btn" onclick="setMode('hard')">Hard</button>
+            </div>
+            <h1>Luna's Maths 🌙</h1>
+            <div id="score-board">
+                <div id="progress-bar-container">
+                    <div id="progress-bar"></div>
+                </div>
+                <div>Question <span id="current-sum">1</span> of 10</div>
+            </div>
+        </header>
+        <main>
+            <div id="character-container">
+                <div id="three-stage"></div>
+            </div>
+            <div id="question-area">
+                <div id="problem">
+                    <span id="num1">0</span>
+                    <span id="operator">+</span>
+                    <span id="num2">0</span>
+                    <span>=</span>
+                    <div id="answer-slot">?</div>
+                </div>
+            </div>
+            <div id="choices-area">
+                <!-- Choices will be generated here -->
+            </div>
+        </main>
+        <div id="overlay" class="hidden">
+            <div id="modal">
+                <h2 id="modal-text">Great Job!</h2>
+                <button onclick="resetGame()">Play Again! 🌟</button>
+            </div>
         </div>
-        <div>Question <span id="current-sum">1</span> of 10</div>
-      </div>
-      <!-- Refresh Button - positioned absolute top right -->
-      <button id="refresh-btn" onclick="resetGame()" title="Start New Game" aria-label="Start New Game" style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #9b5de5 0%, #764ba2 100%); border: 3px solid #fff; border-radius: 50%; width: 50px; height: 50px; min-width: 50px; min-height: 50px; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 0; color: white; visibility: visible; opacity: 1; pointer-events: auto;">🔄</button>
-    </header>
-    <main>
-      <div id="character-container">
-        <div id="three-stage"></div>
-      </div>
-      <div id="question-area">
-        <div id="problem">
-          <span id="num1">0</span>
-          <span id="operator">+</span>
-          <span id="num2">0</span>
-          <span>=</span>
-          <div id="answer-slot">?</div>
-        </div>
-      </div>
-      <div id="choices-area">
-        <!-- Choices will be generated here -->
-      </div>
-    </main>
-    <div id="overlay" class="hidden">
-      <div id="modal">
-        <h2 id="modal-text">Great Job!</h2>
-        <button onclick="resetGame()">Play Again! 🌟</button>
-      </div>
     </div>
-  </div>
-  <!-- External Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-  <script src="script.js"></script>
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
